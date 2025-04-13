@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoTrade</title>
+  <style>
+    * {
+  box-sizing: border-box; /* Ensure padding and margin don't overflow the content */
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #d1f4ff;
+}
+
+header {
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+header a {
+  color: white;
+  margin-left: 15px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-left: 15px;
+}
+
+.search-container input {
+  border: none;
+  outline: none;
+  padding: 5px;
+}
+
+.search-container i {
+  color: #007BFF;
+  margin-left: 5px;
+}
+
+.description {
+  padding: 20px;
+  background-color: #d1f4ff;
+  text-align: center;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.sell-button, .shop-button {
+  display: block;
+  width: 200px;
+  padding: 10px;
+  background-color: #007BFF;
+  color: white;
+  text-align: center;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjust to fit different screen sizes */
+  gap: 20px;
+  padding: 20px;
+}
+
+.product-card {
+  background-color: white;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  position: relative;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+}
+
+.product-card img {
+  width: 100%;
+  height: 200px; /* Ensuring consistent image size */
+  object-fit: cover; /* Ensure images cover the area without distortion */
+  border-radius: 5px;
+}
+
+.uploaded-date {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 12px;
+  color: #888;
+}
+
+.footer {
+  background-color: #333;
+  color: white;
+  padding: 10px;
+  text-align: center;
+}
+
+.load-more,
+.less-button {
+  display: block;
+  margin: 20px auto;
+  padding: 8px 16px;
+  background-color: #007BFF;
+  color: white;
+  text-align: center;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  width: 150px;
+}
+
+.country-message {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.favorites-link:hover {
+  background-color: #ddd;
+  color: #007BFF;
+}
+
+.favorites-link:active {
+  transform: scale(0.95);
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+@media screen and (max-width: 768px) {
+  /* Adjust layout for smaller devices like tablets */
+  .buttons-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sell-button, .shop-button {
+    width: 100%; /* Full width for smaller devices */
+  }
+
+  .products {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Smaller grid items */
+  }
+
+  .header-right {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  header a {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* Adjust layout for mobile devices */
+  .description h2 {
+    font-size: 18px;
+  }
+
+  .products {
+    grid-template-columns: 1fr; /* Stack products in a single column */
+  }
+
+  .product-card img {
+    height: 180px; /* Smaller images on mobile */
+  }
+
+  .header-left h1 {
+    font-size: 20px;
+  }
+
+  .search-container input {
+    width: 150px; /* Ensure search bar fits well on small screens */
+  }
+
+  .header-right select,
+  .search-container input {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 100%; /* Full width for input elements */
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <h1>EcoTrade</h1>
+    </div>
+    <div class="header-right">
+      <select id="country-select">
+        <option value="India">India</option>
+        <option value="USA">USA</option>
+        <option value="UK">UK</option>
+      </select>
+      <div class="search-container">
+        <input type="text" id="category-search" placeholder="Search categories...">
+        <i class="fas fa-search" id="search-icon"></i>
+      </div>
+      <a href="favorites.html" class="favorites-link" id="favorites-link">❤️ Favorites</a>
+      <a href="login.html" id="login-link">Login</a>
+      <a href="signup.html" id="signup-link">Sign Up</a>
+      <a href="about.html" id="about-link">About Us</a>
+    </div>
+  </header>
+
+  <div class="description">
+    <h2>Welcome to EcoTrade</h2>
+    <p>EcoTrade is an online platform that connects buyers and sellers, enabling the trade of pre-owned products in various categories, including electronics, automobiles, fashion, home appliances, and more. The goal of EcoTrade is to provide a seamless, user-friendly experience for individuals to buy and sell used products at competitive prices while contributing to sustainability by promoting the reuse of goods</p>
+  </div>
+
+  <div class="buttons-container">
+    <a href="#" class="sell-button" id="sell-button">Start Selling</a>
+    <a href="shop.html" class="shop-button" id="shop-button">Shop Now</a>
+  </div>
+
+  <div class="products" id="product-list">
+    <div class="product-card" onclick="goToProductPage()">
+      <img src="https://imgd.aeplcdn.com/664x374/n/cw/ec/40027/safari-exterior-right-front-three-quarter-73.jpeg?q=80" alt="Product Image">
+      <h3>Tata Safari 2.0 Kryotec</h3>
+      <p>Cost: ₹10,00,000</p>
+      <div class="uploaded-date">Uploaded: Jan 14, 2025</div>
+      <button onclick="addToCart(event)">Add to Cart</button>
+      <button onclick="addToFavorites(event)">Add to Favorites</button>
+    </div>
+    <div class="product-card" onclick="goToProductPage()">
+      <img src="https://images.unsplash.com/photo-1677144646095-ecd95d06cd71?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8aXBob25lJTIwMTQlMjBwcm98ZW58MHx8MHx8fDA%3D" alt="Product Image">
+      <h3>iPhone 14 Pro Max</h3>
+      <p>Cost: ₹1,25,000</p>
+      <div class="uploaded-date">Uploaded: Feb 5, 2025</div>
+      <button onclick="addToCart(event)">Add to Cart</button>
+      <button onclick="addToFavorites(event)">Add to Favorites</button>
+    </div>
+    <!-- You can add one more product initially if you want -->
+  </div>
+
+  <div class="load-more" id="load-more-btn">Load More</div>
+
+  <div class="less-button" id="less-button" style="display:none;">Show Less</div>
+
+  <div class="country-message" id="country-message"></div>
+
+  <footer class="footer">
+    <p>&copy; 2025 EcoTrade. All rights reserved.</p>
+  </footer>
+
+  <div class="popup" id="popup">
+    <h3>Sell Your Product</h3>
+    <p>Fill out the form to list your product for sale.</p>
+    <button onclick="closePopup()">Close</button>
+  </div>
+
+  <script>
+    // Load More Button Event
+    document.getElementById('load-more-btn').addEventListener('dblclick', function() {
+      const productList = document.getElementById('product-list');
+      const extraProducts = [
+        `<div class="product-card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6-eU8W648SgvunHSq0ZebU3bDitEyDewB0Q&s" alt="Product Image">
+          <h3>iPhone 14 Pro Max</h3>
+          <p>Cost: ₹1,25,000</p>
+          <div class="uploaded-date">Uploaded: Feb 5, 2025</div>
+        </div>`,
+        `<div class="product-card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyt7mlxbUSQ07FRXIWQxrTwXbfX9gNuFO_Ww&s" alt="Product Image">
+          <h3>Honda City 2024</h3>
+          <p>Cost: ₹7,00,000</p>
+          <div class="uploaded-date">Uploaded: Feb 3, 2025</div>
+        </div>`,
+        `<div class="product-card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ_GzuUG-_cLDzBwqsMfNYuRZv_ZWvuzgMyQMsQMmMLPBLZk9z-dnx5jENofApPLCKlXE&usqp=CAU" alt="Product Image">
+          <h3>HP Laptop Pavilion x360</h3>
+          <p>Cost: ₹85,000</p>
+          <div class="uploaded-date">Uploaded: Jan 10, 2025</div>
+        </div>`,
+        `<div class="product-card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSJ7BzQeDqKWNaZ3N7imzG-rDtalgS7N0xBMa6-ZvOu33ux75XOtNHeV-dje7ESrZVrnQ&usqp=CAU" alt="Product Image">
+          <h3>Samsung Galaxy Watch 5</h3>
+          <p>Cost: ₹29,999</p>
+          <div class="uploaded-date">Uploaded: Jan 25, 2025</div>
+        </div>`,
+      ];
+      productList.innerHTML += extraProducts.join('');
+      document.getElementById('load-more-btn').style.display = 'none';
+      document.getElementById('less-button').style.display = 'block';
+    });
+
+    // Show Less Button Event
+    document.getElementById('less-button').addEventListener('click', function() {
+      const productList = document.getElementById('product-list');
+      productList.innerHTML = productList.innerHTML.split('<div class="product-card">').slice(0, 3).join('<div class="product-card">');
+      document.getElementById('less-button').style.display = 'none';
+      document.getElementById('load-more-btn').style.display = 'block';
+    });
+
+    // Country Change Event with Bottom Left Message
+    document.getElementById('country-select').addEventListener('change', function() {
+      const message = document.getElementById('country-message');
+      message.textContent = 'Selected Country: ' + this.value;
+      message.style.opacity = 1;
+      setTimeout(() => {
+        message.style.opacity = 0;
+      }, 3000);
+    });
+
+    // Popup for Sell Button
+    document.getElementById('sell-button').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('popup').style.display = 'block';
+    });
+
+    // Close Popup and Navigate to Sell Form
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
+      window.location.href = 'sell-form.html'; // Redirect after closing popup
+    }
+
+    // Add to Cart Event (using confirm)
+    function addToCart(event) {
+      event.stopPropagation(); // Prevent the product card click event
+      const userConfirmed = confirm('Do you want to add this product to your cart?');
+      if (userConfirmed) {
+        alert('Product added to cart!');
+      }
+    }
+
+    // Add to Favorites Event
+    function addToFavorites(event) {
+      event.stopPropagation(); // Prevent the product card click event
+      alert('Product added to favorites!');
+    }
+
+    // Navigate to Product Page
+    function goToProductPage() {
+      window.location.href = 'product-detail.html'; // Redirect to product detail page
+    }
+
+    // About Us Popup
+    document.getElementById('about-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      alert('Welcome to EcoTrade! Explore and buy pre-owned products.');
+    });
+
+    // Login & Sign Up Events
+    document.getElementById('login-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      alert('Redirecting to Login...');
+      window.location.href = 'login.html';
+    });
+
+    document.getElementById('signup-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      alert('Redirecting to Sign Up...');
+      window.location.href = 'signup.html';
+    });
+  </script>
+</body>
+</html>
